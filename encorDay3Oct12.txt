@@ -1,0 +1,263 @@
+CCNP Encor 3: aka most important day.
+why? all the hands-on lab 3/4 is today.
+
+1. skills required: find the network
+address [for routing]
+
+ex.:               ospf:
+10.86.56.78/12 =  network 10.86.56.78 0.0.0.0 area 0
+                  network 10.80.0.0 0.15.255.255 area 0
+10.100.88.5/13 =
+172.16.150.11/19 =
+192.168.100.77/28 =
+
+task0:  master CIDr for future TeamLEADs.
+
+Task1: Cisco Catalyst Switch vs Nexus SpineLEAF:
+  stp, Rstp, Mistp                cisco Aci.
+
+step1: stp, Rstp, Mistp?
+50k up?: wireshark
+25k up? Hugot Method.
+
+step2: Bobo ba ang Current Network Engineer nyo?
+madaling ma-chack
+
+https://github.com/rivancorp/CCNPent
+
+sudo yersinia -G
+
+sudo su
+
+apt-get update
+
+git clone https://github.com/tomac/yersinia /opt/yersinia
+
+apt install autoconf libgtk-3-dev libnet1-dev libgtk2.0-dev libpcap-dev -y
+
+cd /opt/yersinia
+
+./autogen.sh
+
+./configure --with-gtk
+
+make
+make install
+
+yersinia -G
+
+step4: Master STP, Rapid Stp and MultibleSTP:
+
+stp timers:
+forward delay = 15s
+max age 15s =
+classic states: blk, lis, lrn, fwd:
+
+CCNP RULE1: A HEALTH SWITCH IS ALL GREEN.
+
+how to get Fired Immediately Command:
+kill the expensive feature: stp:
+paste kay baba and taas:
+CONFIG T
+ spanning-tree vlan 1-100
+
+TASK1: THE FIVE superHeroes OF CCNP SWITCH:
+                
+Qpid;	802.1q   trunking
+:Taas/baba:
+config t
+Int Range fa0/10-12
+ shutdown
+ no shutdown
+ switchport
+ switchport trunk Encap Dot1Q
+ switchport mode trunk
+ do sh int trunk
+Darna: 802.1d    stp: primary/secondary root bridge:
+Taas:/D1
+Config t
+spanning-tree mode pvst
+spanning-tree vlan 1-100 root Primary 
+BABA:/D2
+Config t              
+spanning-tree mode pvst
+spanning-tree vlan 1-100 root Secondary
+do sh spanning-tree vlan 1
+
+Ethechannel Configuration: examLAB:
+CiscoProp/Orig/Luma: PortAggregationControlProtocol:Auto/Desirable
+LACP: link AggregationControlProtocol: Active/Passive
+@taas/BABA:
+config t
+Int Range fa0/10-12
+ channel-group 1 mode active
+ channel-protocol Lacp
+ do sh etherchannel summary
+ do sh int po1 | inc BW
+D1:
+config t
+no int po 30
+!
+int range e0/1-2
+ channel-group 10 mode active
+ channel-protocol Lacp
+int range e0/0,e0/3
+ channel-group 20 mode active
+ channel-protocol Lacp
+int range e1/2-3
+ channel-group 30 mode active
+ channel-protocol Lacp
+
+a1:
+config t
+int range e0/1-2
+ channel-group 10 mode active
+ channel-protocol Lacp
+int range e0/3,e1/0
+ channel-group 40 mode active
+ channel-protocol Lacp
+
+D2:
+config t
+int range e0/1-2
+ channel-group 40 mode active
+ channel-protocol Lacp
+int range e0/0,e0/3
+ channel-group 10 mode active
+ channel-protocol Lacp
+int range e0/2-3
+ channel-group 30 mode active
+ channel-protocol Lacp
+
+A2:
+config t
+int range e0/1-2
+ channel-group 20 mode active
+ channel-protocol Lacp
+int range e0/0,e0/3
+ channel-group 10 mode active
+ channel-protocol Lacp
+
+lab2: always protect fiber ports using
+UDLD: Unidirectional Link Detention:
+TAAS:
+config t
+int gi 0/1
+  udld  port aggressive
+  do sh udld
+
+lab3: rootGuard, bdpuGuard, LoopGuard:
+
+TAAS: RootBridge
+config t
+spanning-tree Mode Rapid-pvst
+spanning-tree BackBoneFast
+spanning-tree portfast bpduguard default
+Int Range fa0/1-8
+   spanning-tree Portfast
+   spanning-tree guard root
+
+@BABA: SecondaryRootBridge
+config t
+spanning-tree Mode Rapid-pvst
+spanning-tree UplinkFast
+spanning-tree portfast bpduguard default
+Int Range fa0/1-8
+  spanning-tree Portfast
+  spanning-tree guard root
+  spanning-tree bpduguard enable 
+Int Range fa0/10-12
+  !trunkPorts Into:
+  spanning-tree guard loop
+end
+
+tapos ang STP:   rapid STP.
+
+lab3: MultiPle instance STP: 802.1s/Mst;
+step1: Configure VTP: vlanTrunkingProtocol:
+Taas:
+config t
+vtp domain ccnp
+vtp password pass
+vtp mode server
+vtp version 2
+exit
+
+BABA:
+config t
+vtp domain ccnp
+vtp password pass
+vtp mode server
+vtp version 2
+exit
+
+step2: create Many vlans and deploy in diff. cpu instance:
+create vlans:
+TAAS:
+config t
+vlan 11-19
+exit
+vlan 21-29
+exit
+vlan 31-39
+exit
+BABA: sh vlan brief:
+
+STep3:
+@ENABLE SUPERMAN: 802.1S
+cpu1: vlan 11-19
+cpu2: vlan 21-29
+cpu3: vlan 31-39
+taas,baba,d1,d2,a1,a2:
+CONFIG T
+spanning-tree mode Mst
+spanning-tree mst configuration
+ name supermanstp
+ revision 1
+   Instance 1 vlan 11-19
+   Instance 2 vlan 21-29
+   Instance 3 vlan 31-39
+exit
+do sh spanning-tree mst configuration 
+
+ASSIGMENT: 
+1. TRUNKING, etherchaNNEL, allow v500
+2. ping 10.10.100.1 ping 100.2 ping 100.20
+3. ospf:
+4. route redistribution:
+
+
+
+
+Wonderwoman:  802.1w  rapidSTP
+SuperMan:  802.1s  multipleInstanceSTP
+Xmen:  802.1x   PortBASEd security
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
