@@ -122,7 +122,7 @@ cli.configurep(hi_1)
 ex.6
 
 TASK2: ENABLE RESTAPI: with POSTMAN:
-
+@R3
 config t
 ip http secure-server
 ip http authentication local
